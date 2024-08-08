@@ -13,12 +13,11 @@ there is no data/feature leakage.
 
 Here is an open source implementation of a Point in Time join [query in Feast](https://github.com/feast-dev/feast/blob/b0dc6832ff446429390a916aa9e0e61066cbde1d/sdk/python/feast/infra/offline_stores/redshift.py#L633)
 
-### 1. Understand this query and what edge cases it considers
+##### 1. Understand this query and what edge cases it considers
 
-### 2. Figure out where and how MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is
-being called/referenced throughout this [repo](https://github.com/feast-dev/feast).
+##### 2. Figure out where and how MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is being called/referenced throughout this [repo](https://github.com/feast-dev/feast).
 
-### 3. Implement the PIT join yourself in Python (no usage of SQL).
+##### 3. Implement the PIT join yourself in Python (no usage of SQL).
 
 
 
