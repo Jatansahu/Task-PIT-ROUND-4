@@ -163,3 +163,42 @@ How MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is called in all files:
 #### Summary:
 - Redshift Version: Tailored for Redshift, with modifications for data type handling, timestamp arithmetic, and the absence of the EXCEPT clause. It uses CTEs extensively.
 - BigQuery Version: Optimized for BigQuery, with explicit temporary table creation and BigQuery-specific syntax. It takes advantage of BigQuery's features like EXCEPT and Timestamp_sub().
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+ ## TASK03: Implement the PIT join yourself in Python (no usage of SQL).
+
+ [Click here for code file]()
+
+ #### Problem: 
+Let suppose I am building a recommendation system for an e-commerce platform. I want to recommend products to users based on their browsing history and previous purchases. However, I want to ensure that the recommendations are relevant to the time when the user interacted with the platform.
+
+## Goal :  The goal is to match the interaction data with the most recent relevant feature record for the same product at or before the interaction time.
+
+## Interaction-Specific: The system is expected to return information about the exact product the user interacted with, rather than a different product. The goal is to understand the state of that specific product (e.g., how popular it was) at the time of interaction.
+
+#### Scenario: Product Recommendation Based on Browsing History
+
+1. Base Data (User Interaction Data): This table contains records of user interactions (like clicks, views, or purchases) on the platform.
+
+2. Feature Data (Product Popularity Data): This table contains data about the popularity of products (e.g., number of purchases) over time.
+
+Objective: For each user interaction, join the product with popularity data available up to that PIT while considering a TTL to ensure that only recent popularity data is used.
+
+#### Step 1: Setting Up the Data
+
+1. User Interaction Data (Base Data):
+- Contains records of user interactions with the platform.
+- Columns: Interaction_id, UserId, ProductId, InteractionType, InteractionTime.
+
+2. Product Popularity Data (Feature Data):
+- Contains records of product popularity over time.
+- Columns: ProductId, PopularityScore, RecordTime.
+
+#### Base data
+| Index | Interaction_id | UserId | ProductId | InteractionType | InteractionTime      |
+|-------|----------------|--------|-----------|-----------------|----------------------|
+| 0     | 1              | 101    | P1        | view            | 2023-08-01 12:00:00  |
+| 1     | 2              | 102    | P2        | purchase        | 2023-08-01 15:00:00  |
+| 2     | 3              | 103    | P3        | click           | 2023-08-02 18:00:00  |
+| 3     | 4              | 101    | P1        | purchase        | 2023-08-03 11:00:00  |
+| 4     | 5              | 103    | P3        | view            | 2023-08-03 13:00:00  |
