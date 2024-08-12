@@ -89,19 +89,19 @@ The MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is referenced in the bigquery.py fi
 
 1. Template Usage:
 
-- The MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN template is passed as an argument to the build_point_in_time_query function, which is imported from the offline_utils.py file. This function uses the template to generate the final SQL query that performs a point-in-time join between the feature view tables and the entity dataframe in BigQuery.
+  - The MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN template is passed as an argument to the build_point_in_time_query function, which is imported from the offline_utils.py file. This function uses the template to generate the final SQL query that performs a point-in-time join between the feature view tables and the entity dataframe in BigQuery.
 
 2. Query Generation:
 
-- Inside the get_historical_features method, a query_generator function is defined that:
+  - Inside the get_historical_features method, a query_generator function is defined that:
 
-  - Uploads the entity dataframe (entity_df) to BigQuery.
+    - Uploads the entity dataframe (entity_df) to BigQuery.
 
-  - Validates the columns in the entity dataframe.
+    - Validates the columns in the entity dataframe.
 
-  - Builds a query context using get_feature_view_query_context.
+    - Builds a query context using get_feature_view_query_context.
 
-  - Uses this context along with the MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN template to 
+    - Uses this context along with the MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN template to 
     generate a SQL query.
 
 3. RetrievalJob:
@@ -132,7 +132,8 @@ Constructs a temporary table from left_table_query_string with entity identifier
 
 - Select Latest Features: Chooses the latest feature values based on event timestamps and optionally created timestamps.
 
-Join Feature Views to Entity Dataframe:
-Joins cleaned feature data with the entity dataframe using unique identifiers.
-Final Selection:
-Produces a consolidated table with entity data and the relevant feature data from all feature views.
+#### Join Feature Views to Entity Dataframe:
+- Joins cleaned feature data with the entity dataframe using unique identifiers.
+
+#### Final Selection:
+- Produces a consolidated table with entity data and the relevant feature data from all feature views.
