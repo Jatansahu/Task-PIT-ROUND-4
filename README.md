@@ -20,7 +20,7 @@ Here is an open source implementation of a Point in Time join [query in Feast](h
 ##### 3. Implement the PIT join yourself in Python (no usage of SQL).
 
 
-
+--------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## TASK 01 : Understand this query and what edge cases it considers
 
@@ -37,7 +37,7 @@ Here’s a breakdown of the key aspects of the query linked:
 
 ##### General Purpose:
 
-The query is designed to perform a point-in-time join between the entity data (which likely contains timestamps) and the feature data stored in Redshift. It ensures that only the feature data available before or at the timestamp of the entity data is considered.
+The query is designed to perform a PIT join between the entity data (which contains timestamps) and the feature data stored in Redshift. It ensures that only the feature data available before or at the timestamp of the entity data is considered.
 
 ##### Handling Edge Cases:
 
@@ -51,11 +51,29 @@ The query is designed to perform a point-in-time join between the entity data (w
 
 ##### Key Components of the Query:
 
-- Partitioning and Windowing: The query might use SQL window functions to correctly partition data by entity and order it by timestamp, ensuring that only the most relevant past data is joined.
+- Partitioning and Windowing: The query used SQL window functions to correctly partition data by entity and order it by timestamp, ensuring that only the most relevant past data is joined.
 
 - Filters and Conditions: These help in eliminating rows that might cause data leakage, such as filtering out feature rows that occur after the entity timestamp.
 
-- Edge Case Handling: The query might include specific conditions to deal with missing data or ensure that in case of ties (multiple feature rows with the same timestamp), a consistent method of selection is used.
+- Edge Case Handling: The query include specific conditions to deal with missing data or ensure that in case of ties (multiple feature rows with the same timestamp), a consistent method of selection is used.
 
-##### Conclusion
+##### Observation
 Understanding this query involves recognizing how it manages data in time-sensitive contexts, ensuring that the training data remains clean and unbiased by future information. This is crucial for maintaining the integrity and effectiveness of machine learning models, as it helps prevent data leakage that could artificially inflate model performance during training.
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Task 2. Figure out where and how MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is being called/referenced throughout this [repo](https://github.com/feast-dev/feast).
+
+Answer for WHERE? 
+
+—> MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is called/referenced in 7 files:
+
+a) [bigquery.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/bigquery.py#L293)
+b) [postgres.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/contrib/postgres_offline_store/postgres.py#L432)
+c) [spark.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/contrib/spark_offline_store/spark.py#L571)
+d) [trino.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/contrib/trino_offline_store/trino.py#L527)
+e) [redshift.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/redshift.py#L633)
+f) [snowflake.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/snowflake.py#L712)
+g) [athena.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/contrib/athena_offline_store/athena.py#L540)
