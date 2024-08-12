@@ -123,3 +123,43 @@ Constructs a temporary table from left_table_query_string with entity identifier
 
 #### Final Selection:
 - Produces a consolidated table with entity data and the relevant feature data from all feature views.
+
+#### Note:There is some difference in all files. These differences ensure that each template is optimized for the respective data warehouse environment while maintaining similar overall logic for performing point-in-time joins.
+
+How MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is called in all files:
+
+→Constructs a temporary entity_dataframe view with unique IDs.
+
+→Performs point-in-time joins on feature views, filtering by event timestamp and TTL.
+
+→Deduplicates data if needed, selects the latest features, and assembles the final output query.
+
+#### Difference I found in bigquery.py file and redshift.py file :
+
+#### 1. SQL Syntax Differences:
+- Data Type:
+  - Redshift Version: Uses VARCHAR data type for casting entities and timestamps.
+  - BigQuery Version: Uses STRING data type for casting.
+- Timestamp Arithmetic:
+  - Redshift Version: Uses "t - x * interval '1' second" for timestamp arithmetic to compute TTL-based filtering.
+  - BigQuery Version: Uses Timestamp_sub(...) for similar arithmetic.
+- Column Handling:
+  - Redshift Version: Replaces SELECT * EXCEPT (...) with SELECT * and later drops unnecessary columns, as Redshift doesn't support the EXCEPT clause.
+  - BigQuery Version: Uses SELECT * EXCEPT (...), which is supported in BigQuery.
+- 2. Temporary Table Creation:
+  - Redshift Version: Uses CTEs (WITH clauses) throughout to define intermediate steps but does not explicitly create temporary tables.
+  - BigQuery Version: Explicitly creates temporary tables (CREATE TEMP TABLE) for intermediate results, making the process more memory-efficient in BigQuery.
+- 3. Handling of Entity Identifiers:
+  - Redshift Version: Uses CONCAT and CAST to generate a unique identifier for each entity row.
+  - BigQuery Version: Similar logic, but with CREATE TEMP TABLE for intermediate results and using BigQuery's specific syntax for generating unique IDs.
+- 4. Optimization Considerations:
+  - Redshift Version: The code has TODO comments suggesting potential optimizations, such as using GENERATE_UUID() instead of ROW_NUMBER() and precomputing ROW_NUMBER() to avoid recomputation.
+  - BigQuery Version: While not explicitly mentioned, the use of temporary tables and efficient subqueries suggests it is optimized for BigQuery's architecture.
+- 5. Deduplication Logic:
+  - Redshift Version: Handles deduplication by calculating the MAX(created_timestamp) and joining back to filter out duplicates.
+  - BigQuery Version: Similar approach but executed within the context of BigQuery's processing capabilities.
+- 6. Final Output Construction:
+  - Both Versions: The final output joins the processed feature views back to the entity dataframe. The logic is similar, but the handling of intermediate steps differs due to the platform-specific optimizations.
+#### Summary:
+- Redshift Version: Tailored for Redshift, with modifications for data type handling, timestamp arithmetic, and the absence of the EXCEPT clause. It uses CTEs extensively.
+- BigQuery Version: Optimized for BigQuery, with explicit temporary table creation and BigQuery-specific syntax. It takes advantage of BigQuery's features like EXCEPT and Timestamp_sub().
