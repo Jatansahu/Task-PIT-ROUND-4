@@ -72,9 +72,6 @@ g) [athena.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79a
 
 ### Answer for HOW?
 
-SCREENSHOT
-
-
 ##### For line 293:
 The MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is referenced in the bigquery.py fileand  is used as a SQL query template within the get_historical_features method of the BigQueryOfflineStore class. Here's a breakdown of how it fits into the process:
 
