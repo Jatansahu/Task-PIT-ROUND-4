@@ -66,7 +66,7 @@ Understanding this query involves recognizing how it manages data in time-sensit
 
 ## Task 2. Figure out where and how MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is being called/referenced throughout this [repo](https://github.com/feast-dev/feast).
 
-Answer for WHERE? 
+### Answer for WHERE? 
 
 —> MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is called/referenced in 7 files:
 
@@ -77,3 +77,62 @@ d) [trino.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae
 e) [redshift.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/redshift.py#L633)
 f) [snowflake.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/snowflake.py#L712)
 g) [athena.py](https://github.com/feast-dev/feast/blob/419ca5e9523ff38f27141b79ae12ebb0646c6617/sdk/python/feast/infra/offline_stores/contrib/athena_offline_store/athena.py#L540)
+
+### Answer for HOW?
+
+SCREENSHOT
+
+
+##### For line 293:
+
+The MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is referenced in the bigquery.py fileand  is used as a SQL query template within the get_historical_features method of the BigQueryOfflineStore class. Here's a breakdown of how it fits into the process:
+
+1. Template Usage:
+
+- The MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN template is passed as an argument to the build_point_in_time_query function, which is imported from the offline_utils.py file. This function uses the template to generate the final SQL query that performs a point-in-time join between the feature view tables and the entity dataframe in BigQuery.
+
+2. Query Generation:
+
+- Inside the get_historical_features method, a query_generator function is defined that:
+
+  - Uploads the entity dataframe (entity_df) to BigQuery.
+
+  - Validates the columns in the entity dataframe.
+
+  - Builds a query context using get_feature_view_query_context.
+
+  - Uses this context along with the MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN template to 
+    generate a SQL query.
+
+3. RetrievalJob:
+
+  - The generated SQL query is then used to create a BigQueryRetrievalJob, which handles 
+    executing the query and retrieving the historical feature data.
+
+### Key Points:
+
+- The MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN template is crucial in creating the SQL query 
+  needed to join feature views with the entity dataframe based on timestamps.
+- The query generation process is abstracted within the query_generator function, which is a 
+  context manager ensuring that the temporary BigQuery table (used to store the uploaded entity 
+  dataframe) is cleaned up after use.
+
+#### For line 825:
+
+#### Create Entity Dataframe:
+
+Constructs a temporary table from left_table_query_string with entity identifiers and timestamps.
+
+#### Process Each Feature View:
+- Filter Data: Retrieves feature data where timestamps are ≤ entity timestamps.
+
+- Handle TTL: Applies Time-to-Live (TTL) filter if defined, keeping data within a time range.
+
+- Deduplicate: If a created_timestamp_column is present, deduplicates by keeping the most recent entry for each timestamp.
+
+- Select Latest Features: Chooses the latest feature values based on event timestamps and optionally created timestamps.
+
+Join Feature Views to Entity Dataframe:
+Joins cleaned feature data with the entity dataframe using unique identifiers.
+Final Selection:
+Produces a consolidated table with entity data and the relevant feature data from all feature views.
