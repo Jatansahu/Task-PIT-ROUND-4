@@ -32,7 +32,6 @@ Point-in-time joins are a technique used to combine data from different sources 
 Feast (Feature Store) is an open-source feature store for machine learning, and the query we are examining is part of Feast’s implementation to support point-in-time joins.
 
 #### Analyzing the Query
-
 Here’s a breakdown of the key aspects of the query linked:
 
 ##### General Purpose:
