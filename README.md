@@ -172,12 +172,13 @@ How MULTIPLE_FEATURE_VIEW_POINT_IN_TIME_JOIN is called in all files:
  #### Problem: 
 Let suppose I am building a recommendation system for an e-commerce platform. I want to recommend products to users based on their browsing history and previous purchases. However, I want to ensure that the recommendations are relevant to the time when the user interacted with the platform.
 
-## Goal :  The goal is to match the interaction data with the most recent relevant feature record for the same product at or before the interaction time.
+#### Goal :  
+The goal is to match the interaction data with the most recent relevant feature record for the same product at or before the interaction time.
 
-## Interaction-Specific: The system is expected to return information about the exact product the user interacted with, rather than a different product. The goal is to understand the state of that specific product (e.g., how popular it was) at the time of interaction.
+#### Interaction-Specific: 
+The system is expected to return information about the exact product the user interacted with, rather than a different product. The goal is to understand the state of that specific product (e.g., how popular it was) at the time of interaction.
 
 #### Scenario: Product Recommendation Based on Browsing History
-
 1. Base Data (User Interaction Data): This table contains records of user interactions (like clicks, views, or purchases) on the platform.
 
 2. Feature Data (Product Popularity Data): This table contains data about the popularity of products (e.g., number of purchases) over time.
@@ -202,3 +203,44 @@ Objective: For each user interaction, join the product with popularity data avai
 | 2     | 3              | 103    | P3        | click           | 2023-08-02 18:00:00  |
 | 3     | 4              | 101    | P1        | purchase        | 2023-08-03 11:00:00  |
 | 4     | 5              | 103    | P3        | view            | 2023-08-03 13:00:00  |
+
+#### Product Popularity Data
+| Index | ProductId | PopularityScore | RecordTime           |
+|-------|-----------|-----------------|----------------------|
+| 0     | P1        | 0.5             | 2023-08-01 10:00:00  |
+| 1     | P2        | 0.3             | 2023-08-01 11:00:00  |
+| 2     | P3        | 0.1             | 2023-08-01 14:00:00  |
+| 3     | P1        | 0.7             | 2023-08-02 16:00:00  |
+| 4     | P2        | 0.4             | 2023-08-02 15:00:00  |
+| 5     | P3        | 0.2             | 2023-08-02 20:00:00  |
+| 6     | P1        | 0.8             | 2023-08-03 09:00:00  |
+| 7     | P2        | 0.5             | 2023-08-03 10:00:00  |
+| 8     | P3        | 0.3             | 2023-08-03 12:00:00  |
+
+#### Result 
+| Interaction_id | UserId | ProductId | InteractionType | InteractionTime      | PopularityScore |
+|----------------|--------|-----------|-----------------|----------------------|-----------------|
+| 0              | 101    | P1        | view            | 2023-08-01 12:00:00  | 0.5             |
+| 1              | 102    | P2        | purchase        | 2023-08-01 15:00:00  | 0.3             |
+| 2              | 101    | P1        | purchase        | 2023-08-03 11:00:00  | 0.8             |
+| 3              | 103    | P3        | view            | 2023-08-03 13:00:00  | 0.3             |
+
+#### How data is joined?
+
+For example take interaction_id =1 
+
+Base Data:
+- UserId = 101, ProductId = P1
+- InteractionType = view, InteractionTime = 2023-08-01 12:00:00
+
+Feature Data:
+- P1 has a PopularityScore of 0.5 recorded at 2023-08-01 10:00:00.
+
+#### Reason for Join:
+- This is the most recent record within the TTL (24 hours before the interaction).
+The interaction occurred 2 hours after the popularity record, so the TTL condition is satisfied.
+
+Result: PopularityScore = 0.5
+
+#### Note:
+The system is expected to return information about the exact product the user interacted with, rather than a different product. The goal is to understand the state of that specific product (e.g., how popular it was) at the time of interaction.
